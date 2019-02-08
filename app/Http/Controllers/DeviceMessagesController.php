@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use Validator;
-use App\DeviceMessage;
-use App\Device;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Jobs\SaveDeviceMessage;
 
 class DeviceMessagesController extends Controller
 {
@@ -21,20 +19,8 @@ class DeviceMessagesController extends Controller
     if($validator->fails()){
       return implode(' ', $validator->messages()->all());
     }else{
-      $device_message = new DeviceMessage;
-      try
-      {
-        $device = Device::where('deviceId', $request->get('deviceId'))->firstOrFail();
-        $device_message->device_id = $device->id;
-      }
-      catch(ModelNotFoundException $ex)
-      {
-        return 'Dispositivo não encontrado.';
-      }
-      $device_message->temp = $request->get('temp');
-      $device_message->datetime = $request->get('datetime');
-      $device_message->seqNumber = $request->get('seqNumber');
-      $device_message->save();
+      $saveDeviceMessage = new SaveDeviceMessage($request->all());
+      $this->dispatch($saveDeviceMessage);
       return 'ok';
     }
   }
