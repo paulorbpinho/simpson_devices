@@ -11,4 +11,5 @@
 |
 */
 
+Route::get('device_messages', 'DeviceMessagesController@index')->middleware('auth.basic');
 Route::post('device_messages', 'DeviceMessagesController@store');
